@@ -1,0 +1,67 @@
+# Broad prompts for mutating or high-impact commands.
+
+prefix_rule(
+  pattern = ["git", ["add", "commit", "push", "checkout", "switch", "merge", "rebase", "tag"]],
+  decision = "prompt",
+  match = ["git add .", "git commit -m test", "git push origin main"],
+)
+
+prefix_rule(
+  pattern = [["rm", "del", "erase", "Remove-Item"]],
+  decision = "prompt",
+  match = ["rm file.txt", "Remove-Item file.txt"],
+)
+
+prefix_rule(
+  pattern = [["chmod", "chown", "chgrp", "icacls", "takeown"]],
+  decision = "prompt",
+  match = ["chmod 644 file.txt", "icacls file.txt /grant Everyone:F"],
+)
+
+prefix_rule(
+  pattern = [["kill", "pkill", "taskkill", "Stop-Service", "Restart-Service", "systemctl", "service"]],
+  decision = "prompt",
+  match = ["kill 1234", "systemctl stop nginx"],
+)
+
+prefix_rule(
+  pattern = [["curl", "wget", "Invoke-WebRequest", "iwr", "Invoke-RestMethod", "irm"]],
+  decision = "prompt",
+  match = ["curl https://example.com", "Invoke-WebRequest https://example.com"],
+)
+
+prefix_rule(
+  pattern = [["docker", "kubectl", "helm", "terraform", "aws", "az", "gcloud"]],
+  decision = "prompt",
+  match = ["docker ps", "kubectl get pods", "terraform plan"],
+)
+
+prefix_rule(
+  pattern = [["crontab", "schtasks", "reg"]],
+  decision = "prompt",
+  match = ["crontab -l", "schtasks /query"],
+)
+
+prefix_rule(
+  pattern = [["iptables", "nft", "ufw", "netsh", "route", "ip"]],
+  decision = "prompt",
+  match = ["ufw status", "netsh advfirewall show allprofiles"],
+)
+
+prefix_rule(
+  pattern = [["bash", "sh"], ["-c", "-lc"]],
+  decision = "prompt",
+  match = ["bash -c echo test", "sh -c pwd"],
+)
+
+prefix_rule(
+  pattern = [["pwsh", "pwsh.exe", "powershell", "powershell.exe"], ["-Command", "-c"]],
+  decision = "prompt",
+  match = ["pwsh -Command Get-Date", "powershell -Command Get-Date"],
+)
+
+prefix_rule(
+  pattern = ["cmd", ["/c", "/k"]],
+  decision = "prompt",
+  match = ["cmd /c dir"],
+)

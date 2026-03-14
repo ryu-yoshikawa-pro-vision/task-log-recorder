@@ -1,0 +1,20 @@
+name = "repo-codex-safety-baseline"
+version = "0.1.0"
+description = "Repository safety baseline for Codex runs. Prefer sandboxed execution, approvals, and project execpolicy rules."
+
+custom_instructions = """
+Use the repository safety harness when available (`scripts/codex-safe.ps1`).
+Use `scripts/codex-task.ps1` or `scripts/codex-task.sh` for non-interactive `codex exec` runs that need stable output/report files.
+Treat `scripts/codex-sandbox.*` as an experimental Docker-only path that requires explicit environment setup.
+Do not use dangerous bypass flags or unreviewed destructive commands.
+Prefer read-only inspection first, then ask for approval before mutating operations.
+"""
+
+links = [
+  "docs/plans/2026-02-26_codex-harness-rules-implementation-plan.md",
+  "docs/reports/2026-02-26_ai-agent-dangerous-commands.md",
+]
+
+[meta]
+owner = "repo"
+notes = "Activation of requirements.toml depends on Codex deployment mode / managed policy configuration. Wrapper+rules remain the primary enforcement in this repository, and Docker sandbox is opt-in."

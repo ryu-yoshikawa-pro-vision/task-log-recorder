@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>設定 | 作業ログ記録</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="options-body">
+    <main class="options-shell">
+      <section class="hero-card hero-card-wide">
+        <div>
+          <p class="eyebrow">Settings</p>
+          <h1>設定</h1>
+          <p class="hero-sub">ローカル保存の動きだけを、必要最小限で調整します。</p>
+        </div>
+        <button id="closeButton" class="ghost-button small" type="button">閉じる</button>
+      </section>
+
+      <section class="settings-grid">
+        <article class="options-card">
+          <div class="card-headline">
+            <h2>基本</h2>
+            <p>表示名と重複除外を設定します。</p>
+          </div>
+          <div class="options-grid two">
+            <label class="field">
+              <span class="field-label">プロファイル名</span>
+              <input id="profileLabelInput" type="text" maxlength="80" placeholder="例: 仕事用">
+            </label>
+            <label class="field">
+              <span class="field-label">重複除外秒数</span>
+              <input id="duplicateSecondsInput" type="number" min="0" max="300" step="1">
+            </label>
+          </div>
+        </article>
+
+        <article class="options-card">
+          <div class="card-headline">
+            <h2>コピー</h2>
+            <p>貼り付け時の形式を切り替えます。</p>
+          </div>
+          <div class="options-grid two">
+            <label class="field">
+              <span class="field-label">ヘッダー行</span>
+              <select id="includeHeaderSelect">
+                <option value="true">含める</option>
+                <option value="false">含めない</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="field-label">ショートカット時のタスク名</span>
+              <select id="shortcutUsesLastTaskSelect">
+                <option value="true">直近タスクを使う</option>
+                <option value="false">空欄で記録する</option>
+              </select>
+            </label>
+          </div>
+          <p class="options-note">ショートカットのキー変更は Chrome の「拡張機能のショートカット」で行います。</p>
+        </article>
+      </section>
+
+
+        <article class="options-card help-card">
+          <div class="card-headline">
+            <h2>使い方</h2>
+            <p>迷わず使えるように、最短の流れだけをまとめています。</p>
+          </div>
+          <div class="help-grid">
+            <section class="help-block">
+              <h3>基本の流れ</h3>
+              <ol class="help-list">
+                <li>記録タブを開くと、そのページのタイトルがタスク名に入ります。</li>
+                <li>必要ならタスク名やメモを直して、<strong>開始</strong>・<strong>休憩</strong>・<strong>終了</strong>を押します。</li>
+                <li>履歴タブで直近ログの確認・編集・削除ができます。</li>
+                <li>抽出タブで日付を選び、TSVをコピーしてスプレッドシートへ貼り付けます。</li>
+              </ol>
+            </section>
+            <section class="help-block">
+              <h3>補足</h3>
+              <ul class="help-list">
+                <li>同じ内容を短時間で連続記録すると、重複として保存されません。</li>
+                <li>ショートカットの変更は <span class="mono">chrome://extensions/shortcuts</span> で行います。</li>
+                <li>ヘッダー行の有無は、この設定画面の「コピー」から切り替えられます。</li>
+              </ul>
+            </section>
+          </div>
+        </article>
+
+      <section class="options-card save-row">
+        <div>
+          <h2>保存</h2>
+          <p id="saveStatus" class="hint">変更後に保存してください。</p>
+        </div>
+        <button id="saveButton" class="primary-button" type="button">保存</button>
+      </section>
+
+      <p class="footer-note">ショートカット変更: chrome://extensions/shortcuts</p>
+    </main>
+
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

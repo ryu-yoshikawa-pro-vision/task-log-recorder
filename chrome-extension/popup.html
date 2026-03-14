@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作業ログ記録</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="popup-body">
+    <main class="popup-shell">
+      <header class="hero-card hero-card-wide">
+        <div>
+          <p class="eyebrow">Task Log</p>
+          <h1>作業ログ記録</h1>
+          <p class="hero-sub">記録・履歴・抽出を、小さく速く扱えるように整理しました。</p>
+        </div>
+        <div class="hero-actions">
+          <span id="statusBadge" class="status-badge neutral">待機中</span>
+          <button id="openOptionsButton" class="ghost-button small" type="button">設定</button>
+        </div>
+      </header>
+
+      <nav class="tab-bar" aria-label="メインタブ">
+        <button class="tab-button active" data-tab="record" type="button">記録</button>
+        <button class="tab-button" data-tab="history" type="button">履歴</button>
+        <button class="tab-button" data-tab="export" type="button">抽出</button>
+      </nav>
+
+      <section id="tab-record" class="tab-panel active">
+        <div class="grid-two">
+          <article class="panel card-tight">
+            <div class="panel-head panel-head-compact">
+              <div>
+                <h2>現在のページ</h2>
+                <p class="panel-sub">ポップアップを開いたページの情報を、そのまま記録します。</p>
+              </div>
+              <button id="refreshTabButton" class="ghost-button small" type="button">更新</button>
+            </div>
+            <div class="meta-stack spacious-stack">
+              <div class="meta-item rich-meta-item">
+                <span class="meta-label">タイトル</span>
+                <p id="pageTitle" class="meta-value title-wrap">取得中...</p>
+              </div>
+              <div class="meta-item rich-meta-item">
+                <span class="meta-label">URL</span>
+                <p id="pageUrl" class="meta-value mono url-wrap">取得中...</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel card-tight accent-panel">
+            <div class="panel-head panel-head-compact">
+              <div>
+                <h2>入力</h2>
+                <p class="panel-sub">タスク名は最初にページタイトルを入れます。必要なら上書きしてください。</p>
+              </div>
+            </div>
+            <div class="form-stack">
+              <label class="field">
+                <span class="field-label">タスク名</span>
+                <input id="taskNameInput" type="text" maxlength="120" placeholder="ページタイトルが入ります">
+              </label>
+              <label class="field">
+                <span class="field-label">メモ</span>
+                <textarea id="memoInput" rows="4" maxlength="400" placeholder="必要なら短く入力"></textarea>
+              </label>
+            </div>
+            <div class="button-row three action-row">
+              <button id="startButton" class="primary-button" type="button">開始</button>
+              <button id="breakButton" class="secondary-button" type="button">休憩</button>
+              <button id="endDayButton" class="danger-button" type="button">終了</button>
+            </div>
+            <div class="utility-row">
+              <button id="clearFormButton" class="ghost-button small" type="button">クリア</button>
+              <p id="shortcutStatus" class="hint align-right">ショートカット結果はここに表示されます。</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="tab-history" class="tab-panel">
+        <div class="overview-grid">
+          <article class="metric-card">
+            <span class="metric-label">総件数</span>
+            <strong id="totalLogsMetric" class="metric-value">0</strong>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">最新日</span>
+            <strong id="latestDateMetric" class="metric-value">-</strong>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">表示範囲</span>
+            <strong id="historyRangeMetric" class="metric-value">0 / 0</strong>
+          </article>
+        </div>
+        <article class="panel card-tall">
+          <div class="panel-head">
+            <div>
+              <h2>直近ログ</h2>
+              <p class="panel-sub">10件ずつ表示。編集・削除ができます。</p>
+            </div>
+            <div class="pagination-controls">
+              <button id="historyPrevButton" class="ghost-button small" type="button">前へ</button>
+              <span id="historyPageLabel" class="page-label">1 / 1</span>
+              <button id="historyNextButton" class="ghost-button small" type="button">次へ</button>
+            </div>
+          </div>
+          <div id="recentLogs" class="list-stack empty-state">まだ記録はありません。</div>
+        </article>
+      </section>
+
+      <section id="tab-export" class="tab-panel">
+        <div class="grid-two export-grid">
+          <article class="panel card-tight">
+            <div class="panel-head panel-head-compact">
+              <div>
+                <h2>抽出条件</h2>
+                <p class="panel-sub">ログがある日付だけを選べます。</p>
+              </div>
+              <button id="selectLatestDateButton" class="ghost-button small" type="button">最新日</button>
+            </div>
+            <label class="field">
+              <span class="field-label">日付</span>
+              <select id="exportDateSelect"></select>
+            </label>
+            <div class="button-row two split-actions">
+              <button id="buildTsvButton" class="secondary-button" type="button">抽出する</button>
+              <button id="copyTsvButton" class="primary-button" type="button">コピー</button>
+            </div>
+            <p id="exportSummary" class="hint">日付を選ぶと、この日のログだけを抽出します。</p>
+          </article>
+
+          <article class="panel card-tight accent-panel">
+            <div class="panel-head panel-head-compact">
+              <div>
+                <h2>プレビュー</h2>
+                <p class="panel-sub">TSV形式です。そのままスプレッドシートへ貼り付けできます。</p>
+              </div>
+            </div>
+            <textarea id="tsvPreview" class="preview-textarea" rows="14" readonly placeholder="ここに抽出結果が表示されます"></textarea>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <div id="editModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div>
+            <p class="eyebrow">Edit</p>
+            <h2 id="editModalTitle">ログを編集</h2>
+          </div>
+          <button id="closeEditModalButton" class="ghost-button small" type="button">閉じる</button>
+        </div>
+        <div class="modal-grid">
+          <label class="field">
+            <span class="field-label">種別</span>
+            <select id="editEventTypeSelect"></select>
+          </label>
+          <label class="field">
+            <span class="field-label">タスク名</span>
+            <input id="editTaskNameInput" type="text" maxlength="120">
+          </label>
+          <label class="field field-span-2">
+            <span class="field-label">メモ</span>
+            <textarea id="editMemoInput" rows="4" maxlength="400"></textarea>
+          </label>
+          <label class="field field-span-2">
+            <span class="field-label">タイトル</span>
+            <input id="editPageTitleInput" type="text" maxlength="300">
+          </label>
+          <label class="field field-span-2">
+            <span class="field-label">URL</span>
+            <textarea id="editPageUrlInput" rows="3" maxlength="2000"></textarea>
+          </label>
+        </div>
+        <div class="button-row three equal-buttons modal-actions single-line-actions">
+          <button id="saveEditButton" class="primary-button" type="button">保存</button>
+          <button id="cancelEditButton" class="ghost-button" type="button">キャンセル</button>
+          <button id="deleteEditLogButton" class="ghost-danger-button" type="button">削除</button>
+        </div>
+      </div>
+    </div>
+
+
+    <div id="snackbar" class="snackbar hidden" aria-live="polite" aria-atomic="true"></div>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

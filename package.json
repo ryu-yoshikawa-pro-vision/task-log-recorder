@@ -1,0 +1,17 @@
+{
+  "name": "task-log-recorder",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome lint . && html-validate \"chrome-extension/**/*.html\"",
+    "test": "vitest run",
+    "verify:quality": "npm run format:check && npm run lint && npm run test"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.7",
+    "html-validate": "10.11.1",
+    "vitest": "4.1.0"
+  }
+}

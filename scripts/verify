@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+set -u -o pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+cd "$repo_root"
+
+pass_count=0
+fail_count=0
+skip_count=0
+
+log_pass() {
+  echo "PASS: $1"
+  pass_count=$((pass_count + 1))
+}
+
+log_fail() {
+  echo "FAIL: $1"
+  fail_count=$((fail_count + 1))
+}
+
+log_skip() {
+  echo "SKIP: $1"
+  skip_count=$((skip_count + 1))
+}
+
+run_check() {
+  local name="$1"
+  shift
+  if "$@"; then
+    log_pass "$name"
+  else
+    log_fail "$name"
+  fi
+}
+
+decision_from_json() {
+  local output="$1"
+  local decision
+  decision="${output##*\"decision\":\"}"
+  decision="${decision%%\"*}"
+  [[ -n "$decision" && "$decision" != "$output" ]] || return 1
+  printf '%s' "$decision"
+}
+
+check_template_contract() {
+  [[ -f AGENTS.md ]] || return 1
+  [[ -f PLANS.md ]] || return 1
+  [[ -f CODE_REVIEW.md ]] || return 1
+  [[ -f .codex/templates/PLAN.md ]] || return 1
+  [[ -f .codex/rules/10-readonly-allow.rules ]] || return 1
+  [[ -f scripts/codex-task.ps1 ]] || return 1
+  [[ -f scripts/codex-task.sh ]] || return 1
+  [[ -f scripts/codex-sandbox.ps1 ]] || return 1
+  [[ -f scripts/codex-sandbox.sh ]] || return 1
+  [[ -f scripts/validate-output-schema.py ]] || return 1
+  [[ -f .agents/skills/feature-plan/references/planning-workflow.md ]] || return 1
+  [[ -f .agents/skills/code-review/references/review-workflow.md ]] || return 1
+  [[ -f docs/reference/codex-safety-harness.md ]] || return 1
+  [[ -f docs/reference/codex-implementation-harness.md ]] || return 1
+  rg -q ".agents/skills/feature-plan/SKILL.md" AGENTS.md || return 1
+  rg -q ".agents/skills/code-review/SKILL.md" AGENTS.md || return 1
+  rg -q "docs/reference/codex-safety-harness.md" AGENTS.md || return 1
+  rg -q "docs/reference/codex-implementation-harness.md" AGENTS.md || return 1
+  rg -q ".agents/skills/feature-plan/SKILL.md" PLANS.md || return 1
+  rg -q "docs/plans/TEMPLATE.md" PLANS.md || return 1
+  rg -q ".agents/skills/code-review/SKILL.md" CODE_REVIEW.md || return 1
+  rg -q "findings-first" CODE_REVIEW.md || return 1
+}
+
+check_execpolicy_baseline() {
+  local rule_args=(
+    --rules .codex/rules/10-readonly-allow.rules
+    --rules .codex/rules/20-risky-prompt.rules
+    --rules .codex/rules/30-destructive-forbidden.rules
+  )
+
+  local out decision
+
+  out="$(codex execpolicy check "${rule_args[@]}" -- git status)" || return 1
+  decision="$(decision_from_json "$out")" || return 1
+  [[ "$decision" == "allow" ]] || return 1
+
+  out="$(codex execpolicy check "${rule_args[@]}" -- git add .)" || return 1
+  decision="$(decision_from_json "$out")" || return 1
+  [[ "$decision" == "prompt" ]] || return 1
+
+  out="$(codex execpolicy check "${rule_args[@]}" -- git reset --hard HEAD~1)" || return 1
+  decision="$(decision_from_json "$out")" || return 1
+  [[ "$decision" == "forbidden" ]] || return 1
+
+  return 0
+}
+
+check_bash_wrapper_preflight() {
+  bash scripts/codex-safe.sh --preflight-only >/tmp/codex-safe-preflight.log 2>&1
+}
+
+check_powershell_has_codex() {
+  powershell.exe -NoProfile -Command "if (Get-Command codex -ErrorAction SilentlyContinue) { exit 0 } else { exit 1 }" >/dev/null 2>&1
+}
+
+check_powershell_wrapper_preflight() {
+  powershell.exe -ExecutionPolicy Bypass -File scripts/codex-safe.ps1 -PreflightOnly >/tmp/codex-safe-ps-preflight.log 2>&1
+}
+
+check_npm_quality() {
+  npm run verify:quality
+}
+
+run_check "template contract files" check_template_contract
+
+if [[ -f package.json ]]; then
+  if command -v npm >/dev/null 2>&1; then
+    run_check "npm quality checks" check_npm_quality
+  else
+    log_fail "npm quality checks (package.json exists but npm command not found)"
+  fi
+else
+  log_skip "npm quality checks (package.json not found)"
+fi
+
+if ! command -v codex >/dev/null 2>&1; then
+  log_skip "execpolicy checks (codex command not found)"
+else
+  run_check "execpolicy baseline decisions" check_execpolicy_baseline
+fi
+
+if [[ -x scripts/codex-safe.sh ]]; then
+  run_check "bash wrapper preflight" check_bash_wrapper_preflight
+else
+  log_skip "bash wrapper preflight (scripts/codex-safe.sh not found)"
+fi
+
+if command -v powershell.exe >/dev/null 2>&1; then
+  if check_powershell_has_codex; then
+    run_check "PowerShell wrapper preflight" check_powershell_wrapper_preflight
+  else
+    log_skip "PowerShell wrapper preflight (codex not found in PowerShell PATH)"
+  fi
+else
+  log_skip "PowerShell wrapper preflight (powershell.exe not available)"
+fi
+
+echo "Summary: PASS=$pass_count FAIL=$fail_count SKIP=$skip_count"
+
+if (( fail_count > 0 )); then
+  exit 1
+fi
+
+exit 0

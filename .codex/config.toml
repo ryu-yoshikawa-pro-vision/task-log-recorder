@@ -1,0 +1,14 @@
+# Project-scoped Codex config presets.
+# These profiles are convenience defaults. The safety wrapper (`scripts/codex-safe.ps1`)
+# still injects explicit sandbox/approval flags and validates arguments.
+
+[profiles.repo_safe]
+sandbox_mode = "workspace-write"
+approval_policy = "untrusted"
+
+[profiles.repo_readonly]
+sandbox_mode = "read-only"
+approval_policy = "untrusted"
+
+# Optional (version/organization dependent):
+# experimental_use_repo_requirements = true
