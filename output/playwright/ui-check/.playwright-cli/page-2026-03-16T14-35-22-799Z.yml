@@ -1,0 +1,35 @@
+- generic [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - paragraph [ref=e5]: Task Log
+        - heading "作業ログ記録" [level=1] [ref=e6]
+        - paragraph [ref=e7]: 現在開いているページのタイトルと URL を起点に、作業ログの記録・履歴・抽出で整理。
+      - generic [ref=e8]:
+        - generic [ref=e9]: 履歴をすべて削除しました
+        - button "設定" [ref=e10] [cursor=pointer]
+    - navigation "メインタブ" [ref=e11]:
+      - button "記録" [ref=e12] [cursor=pointer]
+      - button "履歴" [ref=e13] [cursor=pointer]
+      - button "抽出" [active] [ref=e14] [cursor=pointer]
+    - generic [ref=e98]:
+      - article [ref=e99]:
+        - generic [ref=e100]:
+          - generic [ref=e101]:
+            - heading "抽出条件" [level=2] [ref=e102]
+            - paragraph [ref=e103]: ログがある日付だけを選べます。
+          - button "最新日" [disabled] [ref=e104]
+        - generic [ref=e105]:
+          - generic [ref=e106]: 日付
+          - combobox "日付" [disabled] [ref=e107]:
+            - option "ログがありません" [selected]
+        - generic [ref=e108]:
+          - button "抽出する" [ref=e109] [cursor=pointer]
+          - button "コピー" [ref=e110] [cursor=pointer]
+        - paragraph [ref=e111]: まだ抽出できるログがありません。
+      - article [ref=e112]:
+        - generic [ref=e114]:
+          - heading "プレビュー" [level=2] [ref=e115]
+          - paragraph [ref=e116]: TSV形式です。そのままスプレッドシートへ貼り付けできます。
+        - textbox "ここに抽出結果が表示されます" [ref=e117]
+  - generic: 履歴をすべて削除しました

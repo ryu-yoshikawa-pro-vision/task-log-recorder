@@ -18,18 +18,25 @@
   - popup、options、service worker、commands を定義する。
 - `chrome-extension/popup.js`
   - 3タブ UI の状態管理、ログ記録、履歴表示、編集、削除、TSV 抽出を担当する。
+- `chrome-extension/options.js`
+  - 基本 / コピー / ショートカット設定の表示と保存、割り当て状況表示を担当する。
 - `chrome-extension/service_worker.js`
-  - ショートカット入力を受けてバックグラウンドでログを追加する。
+  - ショートカット入力を受けてバックグラウンドでログを追加し、必要時は現在ページへ snackbar を表示する。
+- `chrome-extension/lib/shortcut.js`
+  - ショートカットの command 変換、task name 決定、重複判定、通知文言を集約する。
 - `chrome-extension/lib/storage.js`
-  - `chrome.storage.local` のアクセスを集約する。
+  - `chrome.storage.local` のアクセスを集約し、旧 shortcut 設定値からの移行も担当する。
 - `chrome-extension/lib/utils.js`
   - イベント表示名、重複判定、TSV 変換、日付抽出などの純粋関数を持つ。
 
 ## 主要なデータと制約
 
 - 保存キーは `logs`、`settings`、`lastFingerprint`、`lastTaskName`、`shortcutStatus`。
+- 各ログは `profile_label` を持てる。設定画面の `プロファイル名` に対応し、TSV 抽出でも末尾列へ出力する。
+- shortcut 設定は `shortcutTaskNameMode` を使い、`page-title` を既定、`last-task` を任意切替とする。旧 `shortcutUsesLastTask` は読み出し時に移行する。
 - 重複判定は「直前ログとの fingerprint 一致」かつ「設定秒数以内」で行う。
 - 記録イベントの内部値は `START` / `BREAK` / `END_DAY`。文書でもこの実装との差異を生まないようにする。
+- ショートカット通知は `scripting` 権限と `chrome.scripting.executeScript()` で注入し、`chrome://` 系など注入不可ページでは `shortcutStatus` のみ更新する。
 - 現状はビルド工程なしで unpacked extension として読み込む前提。
 
 ## リポジトリ運用

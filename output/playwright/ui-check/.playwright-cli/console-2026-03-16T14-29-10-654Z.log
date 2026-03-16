@@ -1,0 +1,5 @@
+[   58277ms] TypeError: Cannot read properties of undefined (reading 'local')
+    at getSettings (http://127.0.0.1:4173/lib/storage.js:39:39)
+    at init (http://127.0.0.1:4173/options.js:28:26)
+    at http://127.0.0.1:4173/options.js:127:1
+[   58286ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://127.0.0.1:4173/favicon.ico:0

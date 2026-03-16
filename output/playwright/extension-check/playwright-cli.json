@@ -1,0 +1,14 @@
+﻿{
+  "browser": {
+    "launchOptions": {
+      "headless": false,
+      "args": [
+        "--disable-extensions-except=C:/Users/ryu-yoshikawa/Documents/task-log-recorder/chrome-extension",
+        "--load-extension=C:/Users/ryu-yoshikawa/Documents/task-log-recorder/chrome-extension"
+      ]
+    },
+    "contextOptions": {
+      "viewport": { "width": 1440, "height": 1000 }
+    }
+  }
+}

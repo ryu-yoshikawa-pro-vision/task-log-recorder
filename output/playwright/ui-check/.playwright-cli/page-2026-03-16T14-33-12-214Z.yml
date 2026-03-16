@@ -1,0 +1,49 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - paragraph [ref=e5]: Task Log
+      - heading "作業ログ記録" [level=1] [ref=e6]
+      - paragraph [ref=e7]: 現在開いているページのタイトルと URL を起点に、作業ログの記録・履歴・抽出で整理。
+    - generic [ref=e8]:
+      - generic [ref=e9]: 待機中
+      - button "設定" [ref=e10] [cursor=pointer]
+  - navigation "メインタブ" [ref=e11]:
+    - button "記録" [ref=e12] [cursor=pointer]
+    - button "履歴" [ref=e13] [cursor=pointer]
+    - button "抽出" [ref=e14] [cursor=pointer]
+  - generic [ref=e16]:
+    - article [ref=e17]:
+      - generic [ref=e18]:
+        - generic [ref=e19]:
+          - heading "現在のページ" [level=2] [ref=e20]
+          - paragraph [ref=e21]: ポップアップを開いたページの情報を、そのまま記録します。
+        - button "更新" [ref=e22] [cursor=pointer]
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]: タイトル
+          - paragraph [ref=e26]: Task A
+        - generic [ref=e27]:
+          - generic [ref=e28]: URL
+          - paragraph [ref=e29]: https://example.com/tasks/1
+    - article [ref=e30]:
+      - generic [ref=e32]:
+        - heading "入力" [level=2] [ref=e33]
+        - paragraph [ref=e34]: タスク名は最初にページタイトルを入れます。必要なら上書きしてください。
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - generic [ref=e37]: タスク名
+          - textbox "タスク名" [ref=e38]:
+            - /placeholder: ページタイトルが入ります
+            - text: Task A
+        - generic [ref=e39]:
+          - generic [ref=e40]: メモ
+          - textbox "メモ" [ref=e41]:
+            - /placeholder: 必要なら短く入力
+      - generic [ref=e42]:
+        - button "開始" [ref=e43] [cursor=pointer]
+        - button "休憩" [ref=e44] [cursor=pointer]
+        - button "終了" [ref=e45] [cursor=pointer]
+      - generic [ref=e46]:
+        - button "クリア" [ref=e47] [cursor=pointer]
+        - paragraph [ref=e48]: ショートカット結果はここに表示されます。
+      - paragraph [ref=e49]: ショートカットはすべて割り当て済みです。

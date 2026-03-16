@@ -16,7 +16,7 @@
     "service_worker": "service_worker.js",
     "type": "module"
   },
-  "permissions": ["storage", "activeTab"],
+  "permissions": ["storage", "activeTab", "scripting"],
   "options_page": "options.html",
   "commands": {
     "start-log": {

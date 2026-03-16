@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>設定 | 作業ログ記録</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/chrome-extension/styles.css">
   </head>
   <body class="options-body">
     <main class="options-shell">
@@ -119,6 +119,46 @@
       <p class="footer-note">ショートカット変更: chrome://extensions/shortcuts</p>
     </main>
 
-    <script type="module" src="options.js"></script>
+    <script>
+  (() => {
+    const storage = {
+      settings: {
+        profileLabel: '仕事用',
+        duplicateWindowSeconds: 15,
+        includeHeaderOnCopy: true,
+        shortcutTaskNameMode: 'page-title'
+      }
+    };
+    window.chrome = {
+      storage: {
+        local: {
+          async get(keys) {
+            if (typeof keys === 'string') {
+              return { [keys]: storage[keys] };
+            }
+            return storage;
+          },
+          async set(items) {
+            Object.assign(storage, items);
+          }
+        }
+      },
+      commands: {
+        async getAll() {
+          return [
+            { name: 'start-log', shortcut: 'Ctrl+Shift+1' },
+            { name: 'break-log', shortcut: 'Ctrl+Shift+2' },
+            { name: 'end-day-log', shortcut: '' }
+          ];
+        }
+      },
+      tabs: {
+        async create() {
+          return {};
+        }
+      }
+    };
+  })();
+</script><script type="module" src="/chrome-extension/options.js"></script>
   </body>
 </html>

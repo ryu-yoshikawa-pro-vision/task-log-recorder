@@ -190,32 +190,21 @@ body {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.export-grid {
+.record-grid {
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.record-grid > .panel {
+  min-height: auto;
+}
+
+.settings-grid {
   align-items: start;
 }
 
-.overview-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.metric-card {
-  padding: 16px 18px;
-}
-
-.metric-label {
-  display: block;
-  font-size: 12px;
-  color: var(--text-soft);
-  margin-bottom: 6px;
-}
-
-.metric-value {
-  display: block;
-  font-size: 24px;
-  line-height: 1.1;
+.export-grid {
+  align-items: start;
 }
 
 .panel,
@@ -227,8 +216,12 @@ body {
   min-height: 252px;
 }
 
+.page-section-panel {
+  display: none;
+}
+
 .card-tall {
-  min-height: 430px;
+  min-height: 252px;
 }
 
 .accent-panel {
@@ -258,6 +251,116 @@ body {
 .modal-head h2 {
   margin: 0;
   font-size: 16px;
+}
+
+.panel-toggle {
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  background: transparent;
+  border: none;
+  text-align: left;
+}
+
+.panel-toggle-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.panel-toggle-title {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.panel-toggle-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.panel-toggle-icon {
+  width: 12px;
+  height: 12px;
+  border-right: 2px solid var(--text-soft);
+  border-bottom: 2px solid var(--text-soft);
+  transform: rotate(45deg);
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.panel-toggle[aria-expanded="true"] .panel-toggle-icon {
+  transform: rotate(225deg);
+  border-color: var(--text);
+}
+
+.page-section-toolbar {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.panel-toggle-content {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+  transition:
+    max-height 0.22s ease,
+    opacity 0.18s ease,
+    margin-top 0.18s ease;
+}
+
+.panel-toggle-content.is-open {
+  max-height: 320px;
+  opacity: 1;
+  margin-top: 10px;
+}
+
+.history-panel-head {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 18px;
+}
+
+.history-panel-summary {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+
+.history-inline-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.history-inline-stat {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.history-inline-stat strong {
+  display: block;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .meta-stack,
@@ -430,9 +533,17 @@ button:disabled {
 .button-row,
 .utility-row,
 .pagination-controls,
-.log-actions {
+.log-actions,
+.history-head-actions {
   display: flex;
   gap: 10px;
+}
+
+.history-head-actions {
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .button-row.two > * {
@@ -527,6 +638,16 @@ button:disabled {
   line-height: 1.55;
 }
 
+.history-footer {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.pagination-controls-bottom {
+  justify-content: flex-end;
+}
+
 .log-page {
   overflow-wrap: anywhere;
 }
@@ -605,6 +726,65 @@ button:disabled {
   gap: 16px;
 }
 
+.options-card-full {
+  grid-column: 1 / -1;
+}
+
+.shortcut-bindings-panel {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.shortcut-bindings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.shortcut-bindings-head h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.shortcut-bindings-list {
+  display: grid;
+  gap: 10px;
+}
+
+.shortcut-binding-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.shortcut-binding-label {
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+.shortcut-binding-value {
+  font-size: 13px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.shortcut-binding-value.assigned {
+  color: var(--text);
+}
+
+.shortcut-binding-value.missing {
+  color: #ffb659;
+}
+
 .footer-note {
   text-align: center;
 }
@@ -618,16 +798,16 @@ button:disabled {
 /* v1.2 polish */
 .popup-body {
   width: 780px;
-  min-height: 700px;
+  min-height: 680px;
 }
 
 .popup-shell {
-  gap: 16px;
-  padding: 20px;
+  gap: 14px;
+  padding: 18px;
 }
 
 .hero-card {
-  padding: 20px 22px;
+  padding: 18px 20px;
 }
 
 .hero-sub,
@@ -637,7 +817,6 @@ button:disabled {
 }
 
 .grid-two,
-.overview-grid,
 .modal-grid,
 .meta-stack,
 .list-stack,
@@ -779,7 +958,7 @@ button:disabled {
 
 .help-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
   margin-top: 16px;
 }
@@ -810,7 +989,39 @@ button:disabled {
 }
 
 @media (max-width: 820px) {
-  .help-grid {
+  .settings-grid,
+  .options-grid.two,
+  .modal-grid {
     grid-template-columns: 1fr;
+  }
+
+  .save-row,
+  .history-head-actions,
+  .shortcut-bindings-head,
+  .shortcut-binding-item,
+  .panel-head,
+  .card-headline {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .save-row > button,
+  .history-head-actions > button,
+  .pagination-controls {
+    width: 100%;
+  }
+
+  .page-section-toolbar,
+  .history-footer {
+    justify-content: stretch;
+  }
+
+  .pagination-controls {
+    justify-content: space-between;
+  }
+
+  .history-inline-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
   }
 }

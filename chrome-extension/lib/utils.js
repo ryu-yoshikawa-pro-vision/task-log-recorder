@@ -51,11 +51,8 @@ export function formatDateLabel(dateValue) {
   return `${year}/${month}/${day}`;
 }
 
-export function buildFingerprint({ event_type, task_name, memo, page_url }) {
+export function buildFingerprint({ page_url }) {
   return JSON.stringify({
-    event_type: event_type || "",
-    task_name: task_name || "",
-    memo: memo || "",
     page_url: page_url || "",
   });
 }
@@ -100,6 +97,7 @@ export function logsToTsv(logs, includeHeader = true) {
     "メモ",
     "ページタイトル",
     "URL",
+    "プロファイル名",
   ];
   const rows = logs.map((log) => [
     log.recorded_at_local,
@@ -108,6 +106,7 @@ export function logsToTsv(logs, includeHeader = true) {
     log.memo || "",
     log.page_title || "",
     log.page_url || "",
+    log.profile_label || "",
   ]);
 
   const lines = [];

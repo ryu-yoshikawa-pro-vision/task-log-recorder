@@ -1,0 +1,38 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - paragraph [ref=e5]: Task Log
+        - heading "作業ログ記録" [level=1] [ref=e6]
+        - paragraph [ref=e7]: 現在開いているページのタイトルと URL を起点に、作業ログの記録・履歴・抽出で整理。
+      - generic [ref=e8]:
+        - generic [ref=e9]: 履歴をすべて削除しました
+        - button "設定" [ref=e10] [cursor=pointer]
+    - navigation "メインタブ" [ref=e11]:
+      - button "記録" [ref=e12] [cursor=pointer]
+      - button "履歴" [ref=e13] [cursor=pointer]
+      - button "抽出" [ref=e14] [cursor=pointer]
+    - generic [ref=e50]:
+      - generic [ref=e51]:
+        - article [ref=e52]:
+          - generic [ref=e53]: 総件数
+          - strong [ref=e54]: "0"
+        - article [ref=e55]:
+          - generic [ref=e56]: 最新日
+          - strong [ref=e57]: "-"
+        - article [ref=e58]:
+          - generic [ref=e59]: 表示範囲
+          - strong [ref=e60]: 0 - 0
+      - article [ref=e61]:
+        - generic [ref=e62]:
+          - generic [ref=e63]:
+            - heading "直近ログ" [level=2] [ref=e64]
+            - paragraph [ref=e65]: 10件ずつ表示。編集・削除ができます。
+          - generic [ref=e66]:
+            - button "履歴をすべて削除" [disabled] [ref=e67]
+            - generic [ref=e68]:
+              - button "前へ" [disabled] [ref=e69]
+              - generic [ref=e70]: 1 / 1
+              - button "次へ" [disabled] [ref=e71]
+        - generic [ref=e72]: まだ記録はありません。
+  - generic: 履歴をすべて削除しました

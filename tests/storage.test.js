@@ -2,11 +2,13 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import {
   appendLog,
+  clearLogs,
   DEFAULT_SETTINGS,
   getLastFingerprint,
   getLastTaskName,
   getLogs,
   getSettings,
+  normalizeSettings,
   getShortcutStatus,
   removeLogById,
   saveSettings,
@@ -44,6 +46,29 @@ describe("storage", () => {
     });
   });
 
+  test("getSettings reads legacy shortcutUsesLastTask values", async () => {
+    globalThis.__resetChromeStorage({
+      settings: {
+        profileLabel: "legacy",
+        shortcutUsesLastTask: true,
+      },
+    });
+
+    await expect(getSettings()).resolves.toEqual({
+      ...DEFAULT_SETTINGS,
+      profileLabel: "legacy",
+      shortcutTaskNameMode: "last-task",
+    });
+  });
+
+  test("normalizeSettings migrates legacy false values to page-title mode", () => {
+    expect(
+      normalizeSettings({
+        shortcutUsesLastTask: false,
+      }),
+    ).toEqual(DEFAULT_SETTINGS);
+  });
+
   test("appendLog, updateLog, and removeLogById manage stored logs", async () => {
     const firstLog = { record_id: "1", task_name: "first" };
     const secondLog = { record_id: "2", task_name: "second" };
@@ -64,6 +89,17 @@ describe("storage", () => {
     await expect(getLogs()).resolves.toEqual([
       { record_id: "2", task_name: "updated", memo: "keep" },
     ]);
+  });
+
+  test("clearLogs removes only stored logs", async () => {
+    await appendLog({ record_id: "1", task_name: "first" });
+    await setLastTaskName("残すタスク");
+    await setShortcutStatus("残す状態");
+
+    await expect(clearLogs()).resolves.toEqual([]);
+    await expect(getLogs()).resolves.toEqual([]);
+    await expect(getLastTaskName()).resolves.toBe("残すタスク");
+    await expect(getShortcutStatus()).resolves.toBe("残す状態");
   });
 
   test("lastFingerprint round-trips through storage", async () => {

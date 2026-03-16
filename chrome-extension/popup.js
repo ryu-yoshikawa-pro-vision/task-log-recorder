@@ -1,5 +1,7 @@
+import { buildShortcutBindingStatusMessage } from "./lib/shortcut.js";
 import {
   appendLog,
+  clearLogs,
   getLastFingerprint,
   getLogs,
   getSettings,
@@ -28,6 +30,8 @@ import {
 } from "./lib/utils.js";
 
 const HISTORY_PAGE_SIZE = 10;
+const EMPTY_PAGE_TEXT = "読み込みできません";
+const EMPTY_HISTORY_TEXT = "まだ記録はありません。";
 
 const state = {
   currentTab: null,
@@ -38,9 +42,13 @@ const state = {
   historyPage: 1,
   selectedDate: "",
   editingLogId: null,
+  isPageSectionOpen: false,
+  snackbarTimer: null,
 };
 
 const elements = {
+  pageSectionToggle: document.getElementById("pageSectionToggle"),
+  pageSectionContent: document.getElementById("pageSectionContent"),
   pageTitle: document.getElementById("pageTitle"),
   pageUrl: document.getElementById("pageUrl"),
   refreshTabButton: document.getElementById("refreshTabButton"),
@@ -54,9 +62,13 @@ const elements = {
   recentLogs: document.getElementById("recentLogs"),
   statusBadge: document.getElementById("statusBadge"),
   shortcutStatus: document.getElementById("shortcutStatus"),
-  historyPrevButton: document.getElementById("historyPrevButton"),
-  historyNextButton: document.getElementById("historyNextButton"),
-  historyPageLabel: document.getElementById("historyPageLabel"),
+  shortcutBindingsStatus: document.getElementById("shortcutBindingsStatus"),
+  clearHistoryButton: document.getElementById("clearHistoryButton"),
+  historyPrevButtons: [...document.querySelectorAll("[data-history-prev]")],
+  historyNextButtons: [...document.querySelectorAll("[data-history-next]")],
+  historyPageLabels: [
+    ...document.querySelectorAll("[data-history-page-label]"),
+  ],
   totalLogsMetric: document.getElementById("totalLogsMetric"),
   latestDateMetric: document.getElementById("latestDateMetric"),
   historyRangeMetric: document.getElementById("historyRangeMetric"),
@@ -83,10 +95,12 @@ const elements = {
 
 async function init() {
   hydrateEventOptions();
+  renderPageSection();
   state.settings = await getSettings();
   state.logs = await getLogs();
   await loadCurrentTab({ fillTaskTitle: true, forceFillTask: true });
   await loadShortcutStatus();
+  await loadShortcutBindingsStatus();
   renderAll({ silentPreview: true });
 }
 
@@ -102,8 +116,8 @@ async function loadCurrentTab({
 } = {}) {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   state.currentTab = tab || null;
-  elements.pageTitle.textContent = tab?.title || "取得できません";
-  elements.pageUrl.textContent = tab?.url || "取得できません";
+  elements.pageTitle.textContent = tab?.title || EMPTY_PAGE_TEXT;
+  elements.pageUrl.textContent = tab?.url || EMPTY_PAGE_TEXT;
 
   if (fillTaskTitle) {
     const nextValue = tab?.title || "";
@@ -116,7 +130,22 @@ async function loadCurrentTab({
 async function loadShortcutStatus() {
   const status = await getShortcutStatus();
   elements.shortcutStatus.textContent =
-    status || "ショートカット結果はここに表示されます。";
+    status || "ショートカット状態はここに表示されます。";
+}
+
+async function loadShortcutBindingsStatus() {
+  if (!elements.shortcutBindingsStatus) {
+    return;
+  }
+
+  try {
+    const commands = await chrome.commands.getAll();
+    elements.shortcutBindingsStatus.textContent =
+      buildShortcutBindingStatusMessage(commands);
+  } catch {
+    elements.shortcutBindingsStatus.textContent =
+      "ショートカット設定は chrome://extensions/shortcuts で確認できます。";
+  }
 }
 
 function clearRecordForm() {
@@ -191,6 +220,22 @@ function setActiveTab(tabName) {
   }
 }
 
+function togglePageSection() {
+  state.isPageSectionOpen = !state.isPageSectionOpen;
+  renderPageSection();
+}
+
+function renderPageSection() {
+  if (!elements.pageSectionToggle || !elements.pageSectionContent) {
+    return;
+  }
+
+  const isOpen = state.isPageSectionOpen;
+  elements.pageSectionToggle.setAttribute("aria-expanded", String(isOpen));
+  elements.pageSectionContent.classList.toggle("is-open", isOpen);
+  elements.pageSectionContent.setAttribute("aria-hidden", String(!isOpen));
+}
+
 async function handleRecord(eventType) {
   try {
     await loadCurrentTab();
@@ -202,8 +247,8 @@ async function handleRecord(eventType) {
       event_type: eventType,
       task_name: elements.taskNameInput.value.trim(),
       memo: elements.memoInput.value.trim(),
-      page_title: state.currentTab?.title || "タイトル取得不可",
-      page_url: state.currentTab?.url || "URL取得不可",
+      page_title: state.currentTab?.title || "タイトルを取得できません",
+      page_url: state.currentTab?.url || "URL を取得できません",
       profile_label: state.settings.profileLabel || "",
       created_at_epoch: now,
       source: "popup",
@@ -220,7 +265,7 @@ async function handleRecord(eventType) {
     );
 
     if (duplicated) {
-      setStatus("重複のため未記録", "warn", { snackbar: true });
+      setStatus("重複のため記録しませんでした", "warn", { snackbar: true });
       return;
     }
 
@@ -237,13 +282,14 @@ async function handleRecord(eventType) {
     renderAll({ silentPreview: true });
     setStatus(buildRecordedMessage(payload), "ok", { snackbar: true });
   } catch (error) {
-    setStatus(`失敗: ${error?.message || String(error)}`, "warn", {
+    setStatus(`エラー: ${error?.message || String(error)}`, "warn", {
       snackbar: true,
     });
   }
 }
 
 function renderAll({ silentPreview = false } = {}) {
+  renderPageSection();
   renderHistory();
   renderExportDateOptions();
   rebuildPreviewIfNeeded({ silent: silentPreview });
@@ -254,22 +300,42 @@ function renderHistory() {
   const pageData = paginate(sortedLogs, state.historyPage, HISTORY_PAGE_SIZE);
   state.historyPage = pageData.page;
 
+  renderHistorySummary(sortedLogs, pageData);
+  renderHistoryPagination(pageData);
+  renderHistoryList(pageData);
+}
+
+function renderHistorySummary(sortedLogs, pageData) {
   elements.totalLogsMetric.textContent = String(pageData.totalItems);
+  elements.clearHistoryButton.disabled = pageData.totalItems === 0;
   elements.latestDateMetric.textContent = sortedLogs[0]
     ? getDatePart(sortedLogs[0].recorded_at_iso)
     : "-";
+
   const startNumber =
     pageData.totalItems === 0 ? 0 : (pageData.page - 1) * HISTORY_PAGE_SIZE + 1;
   const endNumber =
     pageData.totalItems === 0 ? 0 : startNumber + pageData.items.length - 1;
   elements.historyRangeMetric.textContent = `${startNumber} - ${endNumber}`;
-  elements.historyPageLabel.textContent = `${pageData.page} / ${pageData.totalPages}`;
-  elements.historyPrevButton.disabled = pageData.page <= 1;
-  elements.historyNextButton.disabled = pageData.page >= pageData.totalPages;
+}
 
+function renderHistoryPagination(pageData) {
+  const label = `${pageData.page} / ${pageData.totalPages}`;
+  for (const element of elements.historyPageLabels) {
+    element.textContent = label;
+  }
+  for (const button of elements.historyPrevButtons) {
+    button.disabled = pageData.page <= 1;
+  }
+  for (const button of elements.historyNextButtons) {
+    button.disabled = pageData.page >= pageData.totalPages;
+  }
+}
+
+function renderHistoryList(pageData) {
   if (!pageData.items.length) {
     elements.recentLogs.className = "list-stack empty-state";
-    elements.recentLogs.textContent = "まだ記録はありません。";
+    elements.recentLogs.textContent = EMPTY_HISTORY_TEXT;
     return;
   }
 
@@ -310,7 +376,7 @@ function renderExportDateOptions() {
       '<option value="">ログがありません</option>';
     elements.exportDateSelect.disabled = true;
     elements.selectLatestDateButton.disabled = true;
-    elements.exportSummary.textContent = "まだ抽出できるログがありません。";
+    elements.exportSummary.textContent = "まだ出力できるログがありません。";
     elements.tsvPreview.value = "";
     state.previewText = "";
     return;
@@ -339,12 +405,12 @@ function buildPreview({ silent = false } = {}) {
   state.previewText = tsv;
   elements.tsvPreview.value = tsv;
   elements.exportSummary.textContent = dateValue
-    ? `${dateValue} のログ ${matched.length} 件を抽出しました。`
+    ? `${dateValue} のログ ${matched.length} 件を出力しました。`
     : "日付を選んでください。";
 
   if (!silent) {
     setStatus(
-      matched.length ? "抽出しました" : "対象なし",
+      matched.length ? "抽出しました" : "対象のログがありません",
       matched.length ? "ok" : "neutral",
       { snackbar: true },
     );
@@ -361,9 +427,10 @@ async function copyPreview() {
   if (!state.previewText) {
     buildPreview();
   }
+
   const text = state.previewText || "";
   if (!text) {
-    setStatus("コピー対象なし", "warn", { snackbar: true });
+    setStatus("コピー対象がありません", "warn", { snackbar: true });
     return;
   }
 
@@ -373,7 +440,9 @@ async function copyPreview() {
   } catch {
     elements.tsvPreview.focus();
     elements.tsvPreview.select();
-    setStatus("プレビューを選択しました", "neutral", { snackbar: true });
+    setStatus("プレビューを選択したので手動でコピーしてください", "neutral", {
+      snackbar: true,
+    });
   }
 }
 
@@ -426,10 +495,12 @@ async function deleteEditedLog() {
   if (!state.editingLogId) {
     return;
   }
+
   const targetLog = getEditingLog();
   if (!targetLog) {
     return;
   }
+
   state.logs = await removeLogById(state.editingLogId);
   closeEditModal();
   renderAll({ silentPreview: true });
@@ -438,9 +509,30 @@ async function deleteEditedLog() {
 
 async function handleDelete(recordId) {
   const targetLog = state.logs.find((log) => log.record_id === recordId);
+  if (!targetLog) {
+    return;
+  }
+
   state.logs = await removeLogById(recordId);
   renderAll({ silentPreview: true });
   setStatus(buildDeletedMessage(targetLog), "ok", { snackbar: true });
+}
+
+async function handleClearHistory() {
+  if (!state.logs.length) {
+    setStatus("削除対象の履歴がありません", "neutral", { snackbar: true });
+    return;
+  }
+
+  const confirmed = window.confirm("履歴をすべて削除します。よろしいですか？");
+  if (!confirmed) {
+    return;
+  }
+
+  state.logs = await clearLogs();
+  state.historyPage = 1;
+  renderAll({ silentPreview: true });
+  setStatus("履歴をすべて削除しました", "ok", { snackbar: true });
 }
 
 function bindEvents() {
@@ -448,9 +540,11 @@ function bindEvents() {
     button.addEventListener("click", () => setActiveTab(button.dataset.tab));
   });
 
+  elements.pageSectionToggle.addEventListener("click", togglePageSection);
+
   elements.refreshTabButton.addEventListener("click", async () => {
     await loadCurrentTab({ fillTaskTitle: true });
-    setStatus("ページ情報を更新", "neutral", { snackbar: true });
+    setStatus("ページ情報を更新しました", "neutral", { snackbar: true });
   });
 
   elements.openOptionsButton.addEventListener("click", () => {
@@ -465,17 +559,22 @@ function bindEvents() {
 
   elements.clearFormButton.addEventListener("click", () => {
     clearRecordForm();
-    setStatus("入力をクリア", "neutral", { snackbar: true });
+    setStatus("入力をクリアしました", "neutral", { snackbar: true });
   });
 
-  elements.historyPrevButton.addEventListener("click", () => {
-    state.historyPage -= 1;
-    renderHistory();
+  elements.historyPrevButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      state.historyPage -= 1;
+      renderHistory();
+    });
   });
-  elements.historyNextButton.addEventListener("click", () => {
-    state.historyPage += 1;
-    renderHistory();
+  elements.historyNextButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      state.historyPage += 1;
+      renderHistory();
+    });
   });
+  elements.clearHistoryButton.addEventListener("click", handleClearHistory);
 
   elements.recentLogs.addEventListener("click", async (event) => {
     const target = event.target;

@@ -11,20 +11,17 @@ import {
 } from "../chrome-extension/lib/utils.js";
 
 describe("utils", () => {
-  test("buildFingerprint normalizes empty values", () => {
+  test("buildFingerprint only uses page_url for duplicate detection", () => {
     expect(
       buildFingerprint({
         event_type: "START",
-        task_name: "",
-        memo: null,
-        page_url: undefined,
+        task_name: "task",
+        memo: "memo",
+        page_url: "https://example.com/tasks",
       }),
     ).toBe(
       JSON.stringify({
-        event_type: "START",
-        task_name: "",
-        memo: "",
-        page_url: "",
+        page_url: "https://example.com/tasks",
       }),
     );
   });
@@ -34,6 +31,25 @@ describe("utils", () => {
     expect(isDuplicate("same", "same", 1000, 7001, 5)).toBe(false);
     expect(isDuplicate("same", "other", 1000, 4000, 5)).toBe(false);
     expect(isDuplicate(null, "same", 1000, 4000, 5)).toBe(false);
+  });
+
+  test("same page_url is treated as duplicate even if event type differs", () => {
+    const lastFingerprint = buildFingerprint({
+      event_type: "START",
+      task_name: "task A",
+      memo: "",
+      page_url: "https://example.com/tasks/1",
+    });
+    const candidateFingerprint = buildFingerprint({
+      event_type: "BREAK",
+      task_name: "task B",
+      memo: "changed",
+      page_url: "https://example.com/tasks/1",
+    });
+
+    expect(
+      isDuplicate(lastFingerprint, candidateFingerprint, 1000, 5000, 5),
+    ).toBe(true);
   });
 
   test("logsToTsv escapes tabs and line breaks", () => {
@@ -47,15 +63,37 @@ describe("utils", () => {
             memo: "memo\nline",
             page_title: "title",
             page_url: "https://example.com",
+            profile_label: "仕事\t用",
           },
         ],
         true,
       ),
     ).toBe(
       [
-        "記録時刻\t種別\tタスク\tメモ\tページタイトル\tURL",
-        "2026/03/14 10:00:00\t開始\ttask name\tmemo line\ttitle\thttps://example.com",
+        "記録時刻\t種別\tタスク\tメモ\tページタイトル\tURL\tプロファイル名",
+        "2026/03/14 10:00:00\t開始\ttask name\tmemo line\ttitle\thttps://example.com\t仕事 用",
       ].join("\n"),
+    );
+  });
+
+  test("logsToTsv appends profile label even without header", () => {
+    expect(
+      logsToTsv(
+        [
+          {
+            recorded_at_local: "2026/03/14 10:00:00",
+            event_type: "BREAK",
+            task_name: "task",
+            memo: "",
+            page_title: "title",
+            page_url: "https://example.com",
+            profile_label: "個人",
+          },
+        ],
+        false,
+      ),
+    ).toBe(
+      "2026/03/14 10:00:00\t休憩\ttask\t\ttitle\thttps://example.com\t個人",
     );
   });
 

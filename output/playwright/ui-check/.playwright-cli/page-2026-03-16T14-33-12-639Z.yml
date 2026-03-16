@@ -1,0 +1,89 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - paragraph [ref=e5]: Settings
+      - heading "設定" [level=1] [ref=e6]
+      - paragraph [ref=e7]: ローカル保存の動きだけを、必要最小限で調整します。
+    - button "閉じる" [ref=e8] [cursor=pointer]
+  - generic [ref=e9]:
+    - article [ref=e10]:
+      - generic [ref=e11]:
+        - heading "基本" [level=2] [ref=e12]
+        - paragraph [ref=e13]: 表示名と重複除外を設定します。
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - generic [ref=e16]: プロファイル名
+          - textbox "プロファイル名" [ref=e17]:
+            - /placeholder: "例: 仕事用"
+            - text: 仕事用
+        - generic [ref=e18]:
+          - generic [ref=e19]: 重複除外秒数
+          - spinbutton "重複除外秒数" [ref=e20]: "15"
+      - paragraph [ref=e21]: 各ログに保存され、TSV 抽出にも含まれる識別用ラベルです。
+    - article [ref=e22]:
+      - generic [ref=e23]:
+        - heading "コピー" [level=2] [ref=e24]
+        - paragraph [ref=e25]: 貼り付け時の形式を切り替えます。
+      - generic [ref=e27]:
+        - generic [ref=e28]: ヘッダー行
+        - combobox "ヘッダー行" [ref=e29]:
+          - option "含める" [selected]
+          - option "含めない"
+      - paragraph [ref=e30]: TSV は末尾に「プロファイル名」列を含めて出力します。
+    - article [ref=e31]:
+      - generic [ref=e32]:
+        - heading "ショートカット" [level=2] [ref=e33]
+        - paragraph [ref=e34]: 記録時のタスク名と割り当て状況を確認します。
+      - generic [ref=e36]:
+        - generic [ref=e37]: ショートカット時のタスク名
+        - combobox "ショートカット時のタスク名" [ref=e38]:
+          - option "現在のページタイトルを使う" [selected]
+          - option "直近タスク名を使う"
+      - paragraph [ref=e39]: 既定では現在のページタイトルをタスク名として記録します。
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - heading "現在の割り当て" [level=3] [ref=e42]
+          - button "ショートカット設定を開く" [ref=e43] [cursor=pointer]
+        - generic [ref=e44]:
+          - generic [ref=e45]:
+            - generic [ref=e46]: 開始
+            - generic [ref=e47]: Ctrl+Shift+1
+          - generic [ref=e48]:
+            - generic [ref=e49]: 休憩
+            - generic [ref=e50]: Ctrl+Shift+2
+          - generic [ref=e51]:
+            - generic [ref=e52]: 終了
+            - generic [ref=e53]: 未割り当て
+        - paragraph [ref=e54]: "未割り当て: 終了。chrome://extensions/shortcuts で設定してください。"
+    - article [ref=e55]:
+      - generic [ref=e56]:
+        - heading "使い方" [level=2] [ref=e57]
+        - paragraph [ref=e58]: 迷わず使えるように、最短の流れだけをまとめています。
+      - generic [ref=e59]:
+        - generic [ref=e60]:
+          - heading "基本の流れ" [level=3] [ref=e61]
+          - list [ref=e62]:
+            - listitem [ref=e63]: 記録タブを開くと、そのページのタイトルがタスク名に入ります。
+            - listitem [ref=e64]:
+              - text: 必要ならタスク名やメモを直して、
+              - strong [ref=e65]: 開始
+              - text: ・
+              - strong [ref=e66]: 休憩
+              - text: ・
+              - strong [ref=e67]: 終了
+              - text: を押します。
+            - listitem [ref=e68]: 履歴タブで直近ログの確認・編集・削除ができます。
+            - listitem [ref=e69]: 抽出タブで日付を選び、TSVをコピーしてスプレッドシートへ貼り付けます。
+        - generic [ref=e70]:
+          - heading "補足" [level=3] [ref=e71]
+          - list [ref=e72]:
+            - listitem [ref=e73]: 同じページを短時間で連続記録すると、重複として保存されません。
+            - listitem [ref=e74]: ショートカットの変更は chrome://extensions/shortcuts で行います。
+            - listitem [ref=e75]: ヘッダー行の有無は、この設定画面の「コピー」から切り替えられます。
+            - listitem [ref=e76]: プロファイル名は各ログに保存され、TSV の末尾列にも出力されます。
+  - generic [ref=e77]:
+    - generic [ref=e78]:
+      - heading "保存" [level=2] [ref=e79]
+      - paragraph [ref=e80]: 変更後に保存してください。
+    - button "保存" [ref=e81] [cursor=pointer]
+  - paragraph [ref=e82]: "ショートカット変更: chrome://extensions/shortcuts"

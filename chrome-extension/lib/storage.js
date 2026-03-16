@@ -1,3 +1,8 @@
+import {
+  SHORTCUT_TASK_NAME_MODES,
+  normalizeShortcutTaskNameMode,
+} from "./shortcut.js";
+
 export const STORAGE_KEYS = {
   LOGS: "logs",
   SETTINGS: "settings",
@@ -10,22 +15,33 @@ export const DEFAULT_SETTINGS = {
   profileLabel: "",
   duplicateWindowSeconds: 10,
   includeHeaderOnCopy: true,
-  shortcutUsesLastTask: true,
+  shortcutTaskNameMode: SHORTCUT_TASK_NAME_MODES.PAGE_TITLE,
 };
 
-export async function getSettings() {
-  const result = await chrome.storage.local.get(STORAGE_KEYS.SETTINGS);
+export function normalizeSettings(settings = {}) {
   return {
-    ...DEFAULT_SETTINGS,
-    ...(result[STORAGE_KEYS.SETTINGS] || {}),
+    profileLabel: String(settings.profileLabel || ""),
+    duplicateWindowSeconds: Math.max(
+      0,
+      Number(
+        settings.duplicateWindowSeconds ??
+          DEFAULT_SETTINGS.duplicateWindowSeconds,
+      ),
+    ),
+    includeHeaderOnCopy: Boolean(
+      settings.includeHeaderOnCopy ?? DEFAULT_SETTINGS.includeHeaderOnCopy,
+    ),
+    shortcutTaskNameMode: normalizeShortcutTaskNameMode(settings),
   };
 }
 
+export async function getSettings() {
+  const result = await chrome.storage.local.get(STORAGE_KEYS.SETTINGS);
+  return normalizeSettings(result[STORAGE_KEYS.SETTINGS] || {});
+}
+
 export async function saveSettings(settings) {
-  const merged = {
-    ...DEFAULT_SETTINGS,
-    ...(settings || {}),
-  };
+  const merged = normalizeSettings(settings || {});
   await chrome.storage.local.set({ [STORAGE_KEYS.SETTINGS]: merged });
   return merged;
 }
@@ -62,6 +78,11 @@ export async function removeLogById(recordId) {
   const next = logs.filter((log) => log.record_id !== recordId);
   await saveLogs(next);
   return next;
+}
+
+export async function clearLogs() {
+  await saveLogs([]);
+  return [];
 }
 
 export async function getLastFingerprint() {

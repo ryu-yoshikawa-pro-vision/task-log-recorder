@@ -12,7 +12,9 @@
         <div>
           <p class="eyebrow">Task Log</p>
           <h1>作業ログ記録</h1>
-          <p class="hero-sub">現在開いているページのタイトルと URL を起点に、作業ログの記録・履歴・抽出で整理。</p>
+          <p class="hero-sub">
+            現在開いているページのタイトルと URL を控えつつ、作業ログの記録・履歴・出力をまとめて行います。
+          </p>
         </div>
         <div class="hero-actions">
           <span id="statusBadge" class="status-badge neutral">待機中</span>
@@ -23,27 +25,41 @@
       <nav class="tab-bar" aria-label="メインタブ">
         <button class="tab-button active" data-tab="record" type="button">記録</button>
         <button class="tab-button" data-tab="history" type="button">履歴</button>
-        <button class="tab-button" data-tab="export" type="button">抽出</button>
+        <button class="tab-button" data-tab="export" type="button">出力</button>
       </nav>
 
       <section id="tab-record" class="tab-panel active">
-        <div class="grid-two">
-          <article class="panel card-tight">
-            <div class="panel-head panel-head-compact">
-              <div>
-                <h2>現在のページ</h2>
-                <p class="panel-sub">ポップアップを開いたページの情報を、そのまま記録します。</p>
-              </div>
+        <div class="grid-two record-grid">
+          <article class="panel card-tight page-section-panel">
+            <button
+              id="pageSectionToggle"
+              class="panel-toggle"
+              type="button"
+              aria-expanded="false"
+              aria-controls="pageSectionContent"
+            >
+              <span class="panel-toggle-copy">
+                <span class="panel-toggle-title">現在のページ</span>
+              </span>
+              <span class="panel-toggle-actions">
+                <span class="panel-toggle-icon" aria-hidden="true"></span>
+              </span>
+            </button>
+            <div class="page-section-toolbar">
               <button id="refreshTabButton" class="ghost-button small" type="button">更新</button>
             </div>
-            <div class="meta-stack spacious-stack">
+            <div
+              id="pageSectionContent"
+              class="meta-stack spacious-stack panel-toggle-content"
+              aria-hidden="true"
+            >
               <div class="meta-item rich-meta-item">
                 <span class="meta-label">タイトル</span>
-                <p id="pageTitle" class="meta-value title-wrap">取得中...</p>
+                <p id="pageTitle" class="meta-value title-wrap">読み込み中...</p>
               </div>
               <div class="meta-item rich-meta-item">
                 <span class="meta-label">URL</span>
-                <p id="pageUrl" class="meta-value mono url-wrap">取得中...</p>
+                <p id="pageUrl" class="meta-value mono url-wrap">読み込み中...</p>
               </div>
             </div>
           </article>
@@ -52,7 +68,9 @@
             <div class="panel-head panel-head-compact">
               <div>
                 <h2>入力</h2>
-                <p class="panel-sub">タスク名は最初にページタイトルを入れます。必要なら上書きしてください。</p>
+                <p class="panel-sub">
+                  タスク名は最初にページタイトルを入れます。必要なら上書きして使ってください。
+                </p>
               </div>
             </div>
             <div class="form-stack">
@@ -62,50 +80,58 @@
               </label>
               <label class="field">
                 <span class="field-label">メモ</span>
-                <textarea id="memoInput" rows="4" maxlength="400" placeholder="必要なら短く入力"></textarea>
+                <textarea id="memoInput" rows="4" maxlength="400" placeholder="必要なメモだけを残せます"></textarea>
               </label>
             </div>
             <div class="button-row three action-row">
               <button id="startButton" class="primary-button" type="button">開始</button>
               <button id="breakButton" class="secondary-button" type="button">休憩</button>
-              <button id="endDayButton" class="danger-button" type="button">終了</button>
+              <button id="endDayButton" class="danger-button" type="button">終業</button>
             </div>
             <div class="utility-row">
               <button id="clearFormButton" class="ghost-button small" type="button">クリア</button>
-              <p id="shortcutStatus" class="hint align-right">ショートカット結果はここに表示されます。</p>
+              <p id="shortcutStatus" class="hint align-right">ショートカット状態はここに表示されます。</p>
             </div>
+            <p id="shortcutBindingsStatus" class="hint align-right">
+              ショートカット割り当てを確認中です。
+            </p>
           </article>
         </div>
       </section>
 
       <section id="tab-history" class="tab-panel">
-        <div class="overview-grid">
-          <article class="metric-card">
-            <span class="metric-label">総件数</span>
-            <strong id="totalLogsMetric" class="metric-value">0</strong>
-          </article>
-          <article class="metric-card">
-            <span class="metric-label">最新日</span>
-            <strong id="latestDateMetric" class="metric-value">-</strong>
-          </article>
-          <article class="metric-card">
-            <span class="metric-label">表示範囲</span>
-            <strong id="historyRangeMetric" class="metric-value">0 / 0</strong>
-          </article>
-        </div>
         <article class="panel card-tall">
-          <div class="panel-head">
-            <div>
-              <h2>直近ログ</h2>
-              <p class="panel-sub">10件ずつ表示。編集・削除ができます。</p>
+          <div class="panel-head history-panel-head">
+            <div class="history-panel-summary">
+              <div>
+                <h2>直近ログ</h2>
+                <p class="panel-sub">10 件ずつ表示し、編集や削除ができます。</p>
+              </div>
+              <div class="history-inline-stats">
+                <span class="history-inline-stat">総件数 <strong id="totalLogsMetric">0</strong></span>
+                <span class="history-inline-stat">最新の日付 <strong id="latestDateMetric">-</strong></span>
+                <span class="history-inline-stat">表示範囲 <strong id="historyRangeMetric">0 - 0</strong></span>
+              </div>
             </div>
-            <div class="pagination-controls">
-              <button id="historyPrevButton" class="ghost-button small" type="button">前へ</button>
-              <span id="historyPageLabel" class="page-label">1 / 1</span>
-              <button id="historyNextButton" class="ghost-button small" type="button">次へ</button>
+            <div class="history-head-actions">
+              <button id="clearHistoryButton" class="ghost-danger-button small" type="button">
+                履歴をすべて削除
+              </button>
+              <div class="pagination-controls">
+                <button class="ghost-button small" data-history-prev type="button">前へ</button>
+                <span class="page-label" data-history-page-label>1 / 1</span>
+                <button class="ghost-button small" data-history-next type="button">次へ</button>
+              </div>
             </div>
           </div>
           <div id="recentLogs" class="list-stack empty-state">まだ記録はありません。</div>
+          <div class="history-footer">
+            <div class="pagination-controls pagination-controls-bottom">
+              <button class="ghost-button small" data-history-prev type="button">前へ</button>
+              <span class="page-label" data-history-page-label>1 / 1</span>
+              <button class="ghost-button small" data-history-next type="button">次へ</button>
+            </div>
+          </div>
         </article>
       </section>
 
@@ -114,30 +140,36 @@
           <article class="panel card-tight">
             <div class="panel-head panel-head-compact">
               <div>
-                <h2>抽出条件</h2>
+                <h2>出力対象</h2>
                 <p class="panel-sub">ログがある日付だけを選べます。</p>
               </div>
-              <button id="selectLatestDateButton" class="ghost-button small" type="button">最新日</button>
+              <button id="selectLatestDateButton" class="ghost-button small" type="button">最新日付</button>
             </div>
             <label class="field">
               <span class="field-label">日付</span>
               <select id="exportDateSelect"></select>
             </label>
             <div class="button-row two split-actions">
-              <button id="buildTsvButton" class="secondary-button" type="button">抽出する</button>
+              <button id="buildTsvButton" class="secondary-button" type="button">抽出</button>
               <button id="copyTsvButton" class="primary-button" type="button">コピー</button>
             </div>
-            <p id="exportSummary" class="hint">日付を選ぶと、この日のログだけを抽出します。</p>
+            <p id="exportSummary" class="hint">日付を選ぶと、その日のログだけを出力できます。</p>
           </article>
 
           <article class="panel card-tight accent-panel">
             <div class="panel-head panel-head-compact">
               <div>
                 <h2>プレビュー</h2>
-                <p class="panel-sub">TSV形式です。そのままスプレッドシートへ貼り付けできます。</p>
+                <p class="panel-sub">TSV 形式です。そのままスプレッドシートへ貼り付けできます。</p>
               </div>
             </div>
-            <textarea id="tsvPreview" class="preview-textarea" rows="14" readonly placeholder="ここに抽出結果が表示されます"></textarea>
+            <textarea
+              id="tsvPreview"
+              class="preview-textarea"
+              rows="14"
+              readonly
+              placeholder="ここに出力結果が表示されます"
+            ></textarea>
           </article>
         </div>
       </section>
@@ -181,7 +213,6 @@
         </div>
       </div>
     </div>
-
 
     <div id="snackbar" class="snackbar hidden" aria-live="polite" aria-atomic="true"></div>
     <script type="module" src="popup.js"></script>
