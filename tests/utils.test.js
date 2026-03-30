@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import {
+  buildTimestampFieldsForTime,
   buildFingerprint,
   escapeHtml,
   filterLogsByDate,
@@ -8,6 +9,8 @@ import {
   isDuplicate,
   logsToTsv,
   paginate,
+  toLocalString,
+  toTimeInputValue,
 } from "../chrome-extension/lib/utils.js";
 
 describe("utils", () => {
@@ -50,6 +53,34 @@ describe("utils", () => {
     expect(
       isDuplicate(lastFingerprint, candidateFingerprint, 1000, 5000, 5),
     ).toBe(true);
+  });
+
+  test("toTimeInputValue returns HH:MM for a valid date", () => {
+    expect(toTimeInputValue(new Date(2026, 2, 14, 10, 23, 45))).toBe("10:23");
+  });
+
+  test("buildTimestampFieldsForTime updates only the local time and resets seconds", () => {
+    const baseDate = new Date(2026, 2, 14, 10, 23, 45);
+    const expectedDate = new Date(baseDate);
+    expectedDate.setHours(8, 5, 0, 0);
+
+    expect(
+      buildTimestampFieldsForTime(baseDate.toISOString(), "08:05"),
+    ).toEqual({
+      recorded_at_iso: expectedDate.toISOString(),
+      recorded_at_local: toLocalString(expectedDate),
+      created_at_epoch: expectedDate.getTime(),
+    });
+  });
+
+  test("buildTimestampFieldsForTime returns null for invalid source or time", () => {
+    expect(buildTimestampFieldsForTime("broken", "08:05")).toBeNull();
+    expect(
+      buildTimestampFieldsForTime(
+        new Date(2026, 2, 14, 10, 23, 45).toISOString(),
+        "24:00",
+      ),
+    ).toBeNull();
   });
 
   test("logsToTsv escapes tabs and line breaks", () => {

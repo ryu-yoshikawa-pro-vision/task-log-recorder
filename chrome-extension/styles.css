@@ -681,6 +681,8 @@ button:disabled {
   align-items: center;
   justify-content: center;
   padding: 18px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: rgba(2, 4, 10, 0.74);
   backdrop-filter: blur(14px);
 }
@@ -691,7 +693,11 @@ button:disabled {
 
 .modal-card {
   width: min(720px, 100%);
+  max-height: calc(100vh - 36px);
   padding: 18px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .modal-grid {

@@ -30,6 +30,17 @@ export function toLocalString(dateInput = new Date()) {
   }).format(date);
 }
 
+export function toTimeInputValue(dateInput) {
+  const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  const hours = `${date.getHours()}`.padStart(2, "0");
+  const minutes = `${date.getMinutes()}`.padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
 export function getTodayInputValue(dateInput = new Date()) {
   const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
   const year = date.getFullYear();
@@ -49,6 +60,48 @@ export function formatDateLabel(dateValue) {
   }
   const [year, month, day] = dateValue.split("-");
   return `${year}/${month}/${day}`;
+}
+
+export function buildTimestampFieldsForTime(dateInput, timeValue) {
+  const baseDate = dateInput instanceof Date ? new Date(dateInput) : new Date(dateInput);
+  if (Number.isNaN(baseDate.getTime())) {
+    return null;
+  }
+
+  if (!/^\d{2}:\d{2}$/.test(timeValue || "")) {
+    return null;
+  }
+
+  const [hoursText, minutesText] = timeValue.split(":");
+  const hours = Number(hoursText);
+  const minutes = Number(minutesText);
+  if (
+    !Number.isInteger(hours) ||
+    !Number.isInteger(minutes) ||
+    hours < 0 ||
+    hours > 23 ||
+    minutes < 0 ||
+    minutes > 59
+  ) {
+    return null;
+  }
+
+  const nextDate = new Date(baseDate);
+  const originalDatePart = getDatePart(baseDate);
+  nextDate.setHours(hours, minutes, 0, 0);
+  if (
+    Number.isNaN(nextDate.getTime()) ||
+    getDatePart(nextDate) !== originalDatePart ||
+    toTimeInputValue(nextDate) !== timeValue
+  ) {
+    return null;
+  }
+
+  return {
+    recorded_at_iso: nextDate.toISOString(),
+    recorded_at_local: toLocalString(nextDate),
+    created_at_epoch: nextDate.getTime(),
+  };
 }
 
 export function buildFingerprint({ page_url }) {

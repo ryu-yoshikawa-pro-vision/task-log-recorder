@@ -13,6 +13,7 @@ import {
 } from "./lib/storage.js";
 import {
   buildFingerprint,
+  buildTimestampFieldsForTime,
   createId,
   escapeHtml,
   EVENT_LABELS,
@@ -25,6 +26,7 @@ import {
   logsToTsv,
   paginate,
   sortLogsDesc,
+  toTimeInputValue,
   toLocalString,
   trimTo,
 } from "./lib/utils.js";
@@ -84,6 +86,7 @@ const elements = {
   closeEditModalButton: document.getElementById("closeEditModalButton"),
   editEventTypeSelect: document.getElementById("editEventTypeSelect"),
   editTaskNameInput: document.getElementById("editTaskNameInput"),
+  editTimeInput: document.getElementById("editTimeInput"),
   editMemoInput: document.getElementById("editMemoInput"),
   editPageTitleInput: document.getElementById("editPageTitleInput"),
   editPageUrlInput: document.getElementById("editPageUrlInput"),
@@ -459,6 +462,7 @@ function openEditModal(recordId) {
   state.editingLogId = recordId;
   elements.editEventTypeSelect.value = log.event_type;
   elements.editTaskNameInput.value = log.task_name || "";
+  elements.editTimeInput.value = toTimeInputValue(log.recorded_at_iso);
   elements.editMemoInput.value = log.memo || "";
   elements.editPageTitleInput.value = log.page_title || "";
   elements.editPageUrlInput.value = log.page_url || "";
@@ -476,8 +480,26 @@ async function saveEditedLog() {
     return;
   }
 
+  if (!elements.editTimeInput.reportValidity()) {
+    setStatus("時刻を確認してください", "warn", { snackbar: true });
+    return;
+  }
+
+  const timestampFields = buildTimestampFieldsForTime(
+    original.recorded_at_iso,
+    elements.editTimeInput.value,
+  );
+  if (!timestampFields) {
+    setStatus("既存の記録時刻または入力時刻が不正なため保存できません", "warn", {
+      snackbar: true,
+    });
+    elements.editTimeInput.focus();
+    return;
+  }
+
   const updated = {
     ...original,
+    ...timestampFields,
     event_type: elements.editEventTypeSelect.value,
     task_name: elements.editTaskNameInput.value.trim(),
     memo: elements.editMemoInput.value.trim(),
