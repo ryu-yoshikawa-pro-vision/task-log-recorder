@@ -10,4 +10,5 @@
 - Notes/Decisions: npm run verify:qualityを採用。Security-only維持。repo settings、branch protection、Secrets、live browser/serviceは使わない。
 - New tasks: run artifacts完了、CI workflow branch/PR、CI result verification。
 - Remaining: workflow未作成、PR/CI pending。
+- Decision: verify:qualityの&&連結ではformat失敗時にlint/test結果が失われるため、同じ既存scriptを独立stepで実行する設計に修正。各品質stepはinstall成功・非cancelledを条件とする。
 - Progress: 40% (2/5)
