@@ -490,9 +490,13 @@ async function saveEditedLog() {
     elements.editTimeInput.value,
   );
   if (!timestampFields) {
-    setStatus("既存の記録時刻または入力時刻が不正なため保存できません", "warn", {
-      snackbar: true,
-    });
+    setStatus(
+      "既存の記録時刻または入力時刻が不正なため保存できません",
+      "warn",
+      {
+        snackbar: true,
+      },
+    );
     elements.editTimeInput.focus();
     return;
   }
