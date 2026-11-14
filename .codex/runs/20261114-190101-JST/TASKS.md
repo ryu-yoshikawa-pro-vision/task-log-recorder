@@ -4,14 +4,14 @@
 - [x] 1. AGENTS、PROJECT_CONTEXT、ADR、READMEとpackage/test構成を確認する。
 - [x] 2. 変更範囲、DoD、副作用境界をdocs/plansの計画書に保存する。
 - [x] 3. run artifactsとleast-privilege PR workflowをfeature branchに追加する。
-- [ ] 4. PRを作成し、最新head SHAのCIを確認する。
-- [ ] 5. REPORTに結果と残件を記録する。
+- [x] 4. PRを作成し、latest head SHAでinstall/format/lint/test successを確認する。
+- [x] 5. REPORTにrun結果、head SHA、PR状態、残件を記録する。
 
 ## Discovered
 - D1. 依存更新PRで不足パッケージや脆弱性が発見された場合は、Security-onlyの範囲で別PRに分ける。
-- D2. CIのBiome format checkで既存の2 source filesがfail。formatter outputがwhitespace/wrapping/standard trailing commaのみで、式・文を変えないと確認後、同じPRで限定修正する。
+- D2. CIのBiome format checkで既存2ファイルのformat driftを検出。Biome formatterの提案を該当ファイルに適用し、CIで再検証済み。
 
 ## Blocked
 - None.
 
-Progress: 60% (3/5)
+Progress: 100% (5/5)
