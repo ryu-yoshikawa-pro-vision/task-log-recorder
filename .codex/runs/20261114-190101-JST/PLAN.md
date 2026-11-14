@@ -24,7 +24,7 @@
 
 ## Approach
 - AGENTSに従い、この計画とrun artifactsを保存する。
-- feature branchにleast-privilege CI workflowを追加し、既存quality commandだけを実行する。
+- feature branchにleast-privilege CI workflowを追加し、既存のformat / lint / test commandsを独立stepで実行する。
 - PRを作成し、run結果をhead SHAへ照合して報告する。
 
 ## Definition of Done
@@ -36,4 +36,4 @@
 - 既存quality checksが現在のdefault branchで失敗する可能性がある。実行結果をそのまま報告し、無関係なsource修正やcheck除外をしない。
 
 ## Thinking Log
-- 2026-11-14 JST: ADR 001がnpm / Biome / html-validate / Vitestを規定。workflow fileと外部CIはなし。unit testsは純粋ロジックを対象にし、network APIs・環境変数・process起動・実ファイル書込みをテストから検出しなかった。https URL文字列はshortcut fixture用で、fetch等の呼出しは未検出。npm run verify:qualityをPR CIで検証する。
+- 2026-11-14 JST: ADR 001がnpm / Biome / html-validate / Vitestを規定。workflow fileと外部CIはなし。unit testsは純粋ロジックを対象にし、network APIs・環境変数・process起動・実ファイル書込みをテストから検出しなかった。https URL文字列はshortcut fixture用で、fetch等の呼出しは未検出。npm run format:check、npm run lint、npm run testをinstall成功後の独立stepとしてPR CIで検証する。
