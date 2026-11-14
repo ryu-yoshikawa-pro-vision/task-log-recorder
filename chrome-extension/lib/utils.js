@@ -63,7 +63,8 @@ export function formatDateLabel(dateValue) {
 }
 
 export function buildTimestampFieldsForTime(dateInput, timeValue) {
-  const baseDate = dateInput instanceof Date ? new Date(dateInput) : new Date(dateInput);
+  const baseDate =
+    dateInput instanceof Date ? new Date(dateInput) : new Date(dateInput);
   if (Number.isNaN(baseDate.getTime())) {
     return null;
   }
