@@ -4,7 +4,7 @@
 - Dependabot security update PRのための安全な継続検証を提案する。
 
 ## Scope
-- In: .github/workflows/ci.yml、docs/plansの計画、run artifacts。
+- In: .github/workflows/ci.yml、Biome確認済みのwhitespace-only変更2ファイル、docs/plansの計画、run artifacts。
 - Out: security/Dependabot settings、通常version update schedule、branch protection、Secrets、実ブラウザー操作、default branchへの直接push、merge/close。
 
 ## Assumptions
@@ -33,7 +33,7 @@
 - PR latest headのCI全stepがsuccess。PRは未mergeのまま。
 
 ## Risks / Unknowns
-- 既存quality checksが現在のdefault branchで失敗する可能性がある。実行結果をそのまま報告し、無関係なsource修正やcheck除外をしない。
+- 既存format driftが見つかった。Biome outputがwhitespace-onlyと確認できた2ファイルだけを整形し、他は変更しない。
 
 ## Thinking Log
 - 2026-11-14 JST: ADR 001がnpm / Biome / html-validate / Vitestを規定。workflow fileと外部CIはなし。unit testsは純粋ロジックを対象にし、network APIs・環境変数・process起動・実ファイル書込みをテストから検出しなかった。https URL文字列はshortcut fixture用で、fetch等の呼出しは未検出。npm run format:check、npm run lint、npm run testをinstall成功後の独立stepとしてPR CIで検証する。
