@@ -6,8 +6,8 @@
 - 期待成果: PRおよびmain pushでnpm ciとnpm run verify:qualityを実行する提案PRと、最新head上のCI結果。
 
 ## 1. ゴール / 完了条件
-- ゴール: 既存の品質コマンドを使ったread-only・secret不要のPR検証を提案する。
-- 完了条件（DoD）: 変更はfeature branchのPRに限定し、workflow permissionはcontents: read、npm install・format・lint・unit testがCIで成功する。mergeやbranch protection変更はしない。
+- ゴール: 既存の個別quality commandsを使ったread-only・secret不要のPR検証を提案する。
+- 完了条件（DoD）: 変更はfeature branchのPRに限定し、workflow permissionはcontents: read、npm ciが成功し、format / lint / unit testの各stepが最新headでsuccessする。mergeやbranch protection変更はしない。
 
 ## 2. スコープ
 - In Scope: .github/workflows/ci.yml、本計画、.codex/runs/20261114-190101-JST/のTASKS/REPORT/PLAN記録。
@@ -32,7 +32,7 @@
   - 対策: 失敗をCIで可視化し、範囲外の不具合修正や検査除外を独断で行わない。
 
 ## 6. 検証方法
-- 実施する確認: PR CIでnpm ci、npm run verify:qualityの各stepを確認する。
+- 実施する確認: PR CIでnpm ciのあと、npm run format:check、npm run lint、npm run testを独立stepで確認する。各stepはinstall成功時に実行し、先行品質stepの失敗でskipしない。
 - 成功判定: runがcompleted/successで、PRのlatest head SHAとrunのSHAが一致する。
 
 ## 7. 成果物
