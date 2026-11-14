@@ -9,6 +9,7 @@
 
 ## Discovered
 - D1. 依存更新PRで不足パッケージや脆弱性が発見された場合は、Security-onlyの範囲で別PRに分ける。
+- D2. CIのBiome format checkで既存の2 source filesがfail。formatter outputの変更は空白・改行だけと確認後、同じPRで限定修正する。
 
 ## Blocked
 - None.
