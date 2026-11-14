@@ -10,7 +10,7 @@
 - 完了条件（DoD）: 変更はfeature branchのPRに限定し、workflow permissionはcontents: read、npm ciが成功し、format / lint / unit testの各stepが最新headでsuccessする。mergeやbranch protection変更はしない。
 
 ## 2. スコープ
-- In Scope: .github/workflows/ci.yml、本計画、.codex/runs/20261114-190101-JST/のTASKS/REPORT/PLAN記録。
+- In Scope: .github/workflows/ci.yml、本計画、.codex/runs/20261114-190101-JST/のTASKS/REPORT/PLAN記録、Biomeが指摘した2 source fileのwhitespace-only formatting correction。
 - Out of Scope: security/Dependabot settings、通常version update schedule、Secrets、実行時のChrome拡張操作、管理設定、merge/close、default branchへの直接push。
 
 ## 3. 実行タスク
@@ -28,8 +28,8 @@
 ## 5. リスクと対策
 - リスク: CIから秘密情報を利用したり、実ブラウザー/外部サービスへ接続する。
   - 対策: ADRで規定されたformat/lint/unit testのみ実行し、workflowはcontents: read、Secretsなし、checkout credentialsを保持しない。
-- リスク: 既存テストが失敗している可能性。
-  - 対策: 失敗をCIで可視化し、範囲外の不具合修正や検査除外を独断で行わない。
+- リスク: format checkが既存の2 source filesで失敗した。
+  - 対策: Biomeの提案がwhitespace-onlyであることを確認できた場合に限り、指摘ファイルだけを整形し、非空白文字が一致することを確認する。そうでなければfailureを記録して変更しない。
 
 ## 6. 検証方法
 - 実施する確認: PR CIでnpm ciのあと、npm run format:check、npm run lint、npm run testを独立stepで確認する。各stepはinstall成功時に実行し、先行品質stepの失敗でskipしない。
