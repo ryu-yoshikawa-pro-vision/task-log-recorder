@@ -12,6 +12,6 @@
   "devDependencies": {
     "@biomejs/biome": "2.4.7",
     "html-validate": "10.11.1",
-    "vitest": "4.1.0"
+    "vitest": "4.1.12"
   }
 }
